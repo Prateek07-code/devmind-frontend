@@ -5,7 +5,11 @@ import ReactMarkdown from 'react-markdown';
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 // So fetch calls look like:
-const response = await fetch(`${API_BASE}/api/ingest`, { ... });
+const response = await fetch(`${API_BASE}/api/ingest`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ repo_url: repoUrlToIngest })
+});
 
 function App() {
   const [inputValue, setInputValue] = useState('');
