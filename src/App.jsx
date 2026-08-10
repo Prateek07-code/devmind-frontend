@@ -72,7 +72,7 @@ function App() {
         const response = await fetch(`${API_BASE}/query/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: userQuestion })
+          body: JSON.stringify({ question: userQuestion , repo_url: currentRepo})
         });
 
         if (!response.ok) throw new Error(`Failed to fetch answer. Status: ${response.status}`);
