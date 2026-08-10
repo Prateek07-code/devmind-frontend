@@ -42,7 +42,7 @@ function App() {
         const data = await response.json();
         
         // Assuming you have a setCurrentRepo state. If you don't, you can delete this line.
-        // setCurrentRepo(repoUrlToIngest); 
+        setCurrentRepo(repoUrlToIngest); 
 
         setMessages((prev) => [
           ...prev,
