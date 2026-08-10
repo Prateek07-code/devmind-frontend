@@ -4,12 +4,7 @@ import ReactMarkdown from 'react-markdown';
 // If you haven't done this yet, change your hardcoded fetch URLs!
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
-// So fetch calls look like:
-const response = await fetch(`${API_BASE}/api/ingest`, {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ repo_url: repoUrlToIngest })
-});
+
 
 function App() {
   const [inputValue, setInputValue] = useState('');
@@ -27,42 +22,42 @@ function App() {
       // PHASE 1: REAL API INGESTION
       // ==========================================
       setIsLoading(true);
-      setMessages([
-        { role: 'system', content: `Cloning and mapping repository: ${inputValue}... This may take a minute.` }
-      ]);
       
-      const repoUrlToIngest = inputValue;
-      setInputValue(''); 
+      // ✅ THIS WAS THE MISSING LINE! We must capture the input before clearing it.
+      const repoUrlToIngest = inputValue; 
+      
+      setInputValue('');
+      setMessages([
+        { role: 'system', content: `Cloning and mapping repository: ${repoUrlToIngest}... This may take a minute.` }
+      ]);
 
       try {
-        const response = await fetch('${API_BASE}/api/ingest', {
+        const response = await fetch(`${API_BASE}/api/ingest`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ repo_url: repoUrlToIngest })
         });
 
         if (!response.ok) throw new Error("Failed to ingest repository");
-
         const data = await response.json();
-
-        setCurrentRepo(repoUrlToIngest);
         
+        // Assuming you have a setCurrentRepo state. If you don't, you can delete this line.
+        // setCurrentRepo(repoUrlToIngest); 
+
         setMessages((prev) => [
-          ...prev, 
+          ...prev,
           { role: 'system', content: `✅ Ingestion complete! ${data.message || 'Brain updated.'} You can now ask questions.` }
         ]);
         setIsIngested(true);
-
       } catch (error) {
-        console.error(error);
+        console.error("Ingestion Error:", error);
         setMessages((prev) => [
-          ...prev, 
-          { role: 'system', content: `❌ Error: Could not reach the backend. Is Uvicorn running?` }
+          ...prev,
+          { role: 'system', content: `❌ Error: Could not reach the backend. Is it running?` }
         ]);
       } finally {
         setIsLoading(false);
       }
-
     } else {
       // ==========================================
       // PHASE 2: REAL API CHAT
@@ -73,28 +68,26 @@ function App() {
       setInputValue('');
       setIsLoading(true);
 
-      // Add a temporary "Thinking..." message
-      setMessages([...newMessages, { role: 'ai', content: "Thinking..." }]);
-
       try {
-        const response = await fetch('${API_BASE}/query/query', {
+        const response = await fetch(`${API_BASE}/query/query`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: userQuestion, repo_url: currentRepo }) 
+          body: JSON.stringify({ question: userQuestion })
         });
 
-        if (!response.ok) {
-           throw new Error(`Failed to fetch answer. Status: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`Failed to fetch answer. Status: ${response.status}`);
         const data = await response.json();
-        
-        // Replace "Thinking..." with the actual AI response
-        setMessages([...newMessages, { role: 'ai', content: data.answer || data.response || "No response received." }]); 
 
+        setMessages((prev) => [
+          ...prev,
+          { role: 'assistant', content: data.answer || data.response || "Here is the answer based on the codebase." }
+        ]);
       } catch (error) {
-        console.error(error);
-        setMessages([...newMessages, { role: 'ai', content: `❌ Error: ${error.message}` }]);
+        console.error("Chat Error:", error);
+        setMessages((prev) => [
+          ...prev,
+          { role: 'system', content: `❌ Error: Could not fetch answer.` }
+        ]);
       } finally {
         setIsLoading(false);
       }
