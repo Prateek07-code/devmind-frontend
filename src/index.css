@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* Ensure paragraphs have vertical spacing */
+.chat-message p {
+  margin-bottom: 0.75rem;
+  line-height: 1.6;
+}
+
+/* Style inline code or code snippets nicely */
+.chat-message code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  background-color: #262626;
+  color: #e5e7eb;
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875rem;
+}
+
+/* Style full code blocks */
+.chat-message pre {
+  background-color: #1e1e1e !important;
+  color: #d4d4d4 !important;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  border: 1px solid #333333;
+}
+
+.chat-message pre code {
+  background-color: transparent;
+  padding: 0;
+  color: inherit;
+}
+body {
+  background-color: #0a0a0a; /* True deep dark background */
+  color: #e5e5e5; /* Soft white text to reduce eye strain */
+  /* This ensures smooth font rendering just like the reference */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
